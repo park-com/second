@@ -998,33 +998,67 @@ uint256 WantedByOrphan(const CBlock* pblockOrphan)
 }
 
 // miner's coin base reward
-int64_t GetProofOfWorkReward(int64_t nFees)
+int64_t GetProofOfWorkReward(int nHeight, int64_t nFees)
 {
-    
-            int64_t nSubsidy = 15 * COIN;
 
-            if(nBestHeight == 0)
-            {
-            nSubsidy = 1200000 * COIN;
-            }
+    int64_t nSubsidy = 0;
 
-    if (fDebug && GetBoolArg("-printcreation"))
-        printf("GetProofOfWorkReward() : create=%s nSubsidy=%"PRId64"\n", FormatMoney(nSubsidy).c_str(), nSubsidy);
+    if (nHeight <= 1)
+        nSubsidy = PB * COIN;
+    else if(nHeight >= 1 && nHeight < ONE_YEAR_BLOCKS * 4)
+    {
+        nSubsidy = 20 * COIN;
+    }
+    else if(nHeight >= ONE_YEAR_BLOCKS * 4 && nHeight < ONE_YEAR_BLOCKS * 8)
+    {
+        nSubsidy = 10 * COIN;
+    }
+        else if(nHeight >= ONE_YEAR_BLOCKS * 8 && nHeight < ONE_YEAR_BLOCKS * 12)
+    {
+        nSubsidy = 5 * COIN;
+    }
+        else if(nHeight >= ONE_YEAR_BLOCKS * 12 && nHeight < ONE_YEAR_BLOCKS * 16)
+    {
+        nSubsidy = 2.50 * COIN;
+    }
+        else if(nHeight >= ONE_YEAR_BLOCKS * 16 && nHeight < ONE_YEAR_BLOCKS * 20)
+    {
+        nSubsidy = 1.25 * COIN;
+    }
 
+    if (fDebug && GetBoolArg("-printpriority", false))
+       printf("GetProofOfWorkReward() : create=%s nSubsidy=%"PRId64"\n", FormatMoney(nSubsidy).c_str(), nSubsidy);
     return nSubsidy + nFees;
 }
-
 // miner's coin stake reward based on coin age spent (coin-days)
-int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees)
+
+int64_t GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64_t nFees)
 {
-    int64_t nSubsidy = nCoinAge * COIN_YEAR_REWARD * 33 / (365 * 33 + 8);
 
-    if (fDebug && GetBoolArg("-printcreation"))
+    int64_t nDiv = (365 * 33 + 8);
+    int64_t nSubsidy = 0;
+
+    if( nHeight < ONE_YEAR_BLOCKS)
+    {
+        nSubsidy = 4 * COIN_YEAR_REWARD * nCoinAge *33 / nDiv;
+    }
+    else if( nHeight < 2 * ONE_YEAR_BLOCKS)
+    {
+        nSubsidy = 3 * COIN_YEAR_REWARD * nCoinAge * 33 / nDiv;
+    }
+    else if ( nHeight < 3 * ONE_YEAR_BLOCKS)
+    {
+        nSubsidy = 2 * COIN_YEAR_REWARD * nCoinAge * 33 / nDiv;
+    }
+    else
+    {
+        nSubsidy = COIN_YEAR_REWARD * nCoinAge * 33 / nDiv;
+    }
+
+    if (fDebug && GetBoolArg("-printpriority", false))
         printf("GetProofOfStakeReward(): create=%s nCoinAge=%"PRId64"\n", FormatMoney(nSubsidy).c_str(), nCoinAge);
-
     return nSubsidy + nFees;
 }
-
 static const int64_t nTargetTimespan = 16 * 60;  // 16 mins
 
 //
@@ -1577,7 +1611,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
 
     if (IsProofOfWork())
     {
-        int64_t nReward = GetProofOfWorkReward(nFees);
+        int64_t nReward = GetProofOfWorkReward(pindex->nHeight, nFees);
         // Check coinbase reward
         if (vtx[0].GetValueOut() > nReward)
             return DoS(50, error("ConnectBlock() : coinbase reward exceeded (actual=%"PRId64" vs calculated=%"PRId64")",
@@ -1591,7 +1625,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
         if (!vtx[1].GetCoinAge(txdb, nCoinAge))
             return error("ConnectBlock() : %s unable to get coin age for coinstake", vtx[1].GetHash().ToString().substr(0,10).c_str());
 
-        int64_t nCalculatedStakeReward = GetProofOfStakeReward(nCoinAge, nFees);
+        int64_t nCalculatedStakeReward = GetProofOfStakeReward(pindex->nHeight, nCoinAge, nFees);
 
         if (nStakeReward > nCalculatedStakeReward)
             return DoS(100, error("ConnectBlock() : coinstake pays too much(actual=%"PRId64" vs calculated=%"PRId64")", nStakeReward, nCalculatedStakeReward));

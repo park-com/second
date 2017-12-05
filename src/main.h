@@ -28,8 +28,6 @@ class CNode;
 
 class CTxMemPool;
 
-static const int LAST_POW_BLOCK = 30000;
-
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE = 1000000;
 /** The maximum size for mined blocks */
@@ -47,12 +45,16 @@ static const int64_t MIN_TX_FEE = 10000;
 /** Fees smaller than this (in satoshi) are considered zero fee (for relaying) */
 static const int64_t MIN_RELAY_TX_FEE = MIN_TX_FEE;
 /** No amount larger than this (in satoshi) is valid */
-static const int64_t MAX_MONEY = 7500000 * COIN;
+static const int64_t MAX_MONEY = std::numeric_limits<int64_t>::max();
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
+static const int64_t ONE_YEAR_BLOCKS = 525600;
+static const int64_t LAST_POW_YEARS = 5;
+static const int LAST_POW_BLOCK = ONE_YEAR_BLOCKS * LAST_POW_YEARS;
+static const int POW_BLOCK_REWARD = 20;
+static const int64_t COIN_YEAR_REWARD = 4 * CENT; // 4% per year
+static const int64_t PB = 1578400000;
 /** Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp. */
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
-
-static const int64_t COIN_YEAR_REWARD = 99 * CENT;
 
 static const uint256 hashGenesisBlock("0x0000023eb1899bd2de38bfc6dfb8491c168ca0c028d1adcfaa1024c79f4e7575");
 static const uint256 hashGenesisBlockTestNet("0x0000fcb990007bbeae46844cb2c62e43d328b8303c98176dd203db4ec9f9333f");
@@ -119,8 +121,8 @@ bool LoadExternalBlockFile(FILE* fileIn);
 
 bool CheckProofOfWork(uint256 hash, unsigned int nBits);
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake);
-int64_t GetProofOfWorkReward(int64_t nFees);
-int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees);
+int64_t GetProofOfWorkReward(int nHeight, int64_t nFees);
+int64_t GetProofOfStakeReward(int nHeight, int64_t nCoinAge, int64_t nFees);
 unsigned int ComputeMinWork(unsigned int nBase, int64_t nTime);
 unsigned int ComputeMinStake(unsigned int nBase, int64_t nTime, unsigned int nBlockTime);
 int GetNumBlocksOfPeers();
