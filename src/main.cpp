@@ -2578,10 +2578,10 @@ bool LoadBlockIndex(bool fAllowNew)
         //    CTxOut(empty)
         //  vMerkleTree: 12630d16a9
 
-        const char* pszTimestamp = "2017/12/06 Politics: Trump Shares Inflammatory";
+        const char* pszTimestamp = "2017/12/06 Politics: Trump Inflammatory";
         CTransaction txNew;
         //txNew.nTime = 1512440882;
-        txNew.nTime = 1512561007;
+        txNew.nTime = 1512566233;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
         txNew.vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
@@ -2591,9 +2591,9 @@ bool LoadBlockIndex(bool fAllowNew)
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1512561007;
+        block.nTime    = 1512566233;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
-        block.nNonce   = !fTestNet ? 6357090: 0;
+        block.nNonce   = !fTestNet ? 2192227: 104403;
         
         if (true  && (block.GetHash() != hashGenesisBlock)) {     // pskbank
                std::cout << "search mainnet genesis blocks" << std::endl;
@@ -2622,7 +2622,7 @@ bool LoadBlockIndex(bool fAllowNew)
         printf("block.nTime = %u \n", block.nTime);
         printf("block.nNonce = %u \n", block.nNonce);
          
-        assert(block.hashMerkleRoot == uint256("0x3062898269783fcb854598544f3141bfbeb39d828f06b55909f55cab0c818878")); // pskbank
+        assert(block.hashMerkleRoot == uint256("0x85da29418c8da335009b30951aedea47fe401b9a0f50712a073a920e44169fb6")); // pskbank
         assert(block.GetHash() == (!fTestNet ? hashGenesisBlock : hashGenesisBlockTestNet));
         assert(block.CheckBlock());
 
