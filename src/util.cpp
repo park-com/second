@@ -1053,13 +1053,54 @@ boost::filesystem::path GetConfigFile()
     return pathConfigFile;
 }
 
+string randomStrGen(int length) {
+    static string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    string result;
+    result.resize(length);
+    for (int32_t i = 0; i < length; i++)
+        result[i] = charset[rand() % charset.length()];
+
+    return result;
+}
+
+void createConf()       //Automatic sumcoin.conf generation
+{
+    srand(time(NULL));
+
+    ofstream pConf;
+    pConf.open(GetConfigFile().generic_string().c_str());
+    const char* nodes =  "\nrpcport=13801"
+                         "\nport=13800"
+                         "\nrpcallowip=127.0.0.1"
+                         "\ndaemon=1"
+                         "\nserver=1"
+                         "\nlistenonion=0"
+                         "\naddnode=soompay.net"
+                         "\naddnode=14.63.222.81"
+                         "\naddnode=172.30.1.1"
+                         "\naddnode=172.30.1.7"
+                         "\naddnode=172.30.1.48"
+                         "\naddnode=172.30.1.52"
+                         "\naddnode=172.30.1.23";
+
+    pConf   << std::string("rpcuser=sumcoinrpc")
+   //       +  randomStrGen(5)
+            + std::string("\nrpcpassword=")
+            + randomStrGen(15)
+            + std::string(nodes);
+
+    pConf.close();
+}
+
 void ReadConfigFile(map<string, string>& mapSettingsRet,
                     map<string, vector<string> >& mapMultiSettingsRet)
 {
+   
     boost::filesystem::ifstream streamConfig(GetConfigFile());
-    if (!streamConfig.good())
+    if (!streamConfig.good()) {
+         createConf();
         return; // No bitcoin.conf file is OK
-
+    }
     set<string> setOptions;
     setOptions.insert("*");
 
