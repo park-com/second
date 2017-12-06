@@ -1005,7 +1005,7 @@ int64_t GetProofOfWorkReward(int nHeight, int64_t nFees)
 
     if (nHeight <= 1)
         nSubsidy = PB * COIN;
-    else if(nHeight >= 1 && nHeight < ONE_YEAR_BLOCKS * 4)
+    else if(nHeight > 1 && nHeight < ONE_YEAR_BLOCKS * 4)
     {
         nSubsidy = 20 * COIN;
     }
@@ -1029,8 +1029,7 @@ int64_t GetProofOfWorkReward(int nHeight, int64_t nFees)
     if (fDebug && GetBoolArg("-printpriority", false))
        printf("GetProofOfWorkReward() : create=%s nSubsidy=%"PRId64"\n", FormatMoney(nSubsidy).c_str(), nSubsidy);
 
-    fprintf( stderr, "POW nHeight=%d  nSubsidy=%11d \n",nHeight, nSubsidy );
-    printf("POW nHeight=%d  nSubsidy=%11d \n",nHeight, nSubsidy );
+    printf("POW nHeight=%d  nSubsidy=%lld \n",nHeight, nSubsidy );
  
     return nSubsidy + nFees;
 }
@@ -2579,9 +2578,10 @@ bool LoadBlockIndex(bool fAllowNew)
         //    CTxOut(empty)
         //  vMerkleTree: 12630d16a9
 
-        const char* pszTimestamp = "2017/11/30 Politics: Trump Shares Inflammatory";
+        const char* pszTimestamp = "2017/12/06 Politics: Trump Shares Inflammatory";
         CTransaction txNew;
-        txNew.nTime = 1512440882;
+        //txNew.nTime = 1512440882;
+        txNew.nTime = 1512561007;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
         txNew.vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
@@ -2591,9 +2591,9 @@ bool LoadBlockIndex(bool fAllowNew)
         block.hashPrevBlock = 0;
         block.hashMerkleRoot = block.BuildMerkleTree();
         block.nVersion = 1;
-        block.nTime    = 1512440882;
+        block.nTime    = 1512561007;
         block.nBits    = bnProofOfWorkLimit.GetCompact();
-        block.nNonce   = !fTestNet ? 1095746: 90130;
+        block.nNonce   = !fTestNet ? 6357090: 0;
         
         if (true  && (block.GetHash() != hashGenesisBlock)) {     // pskbank
                std::cout << "search mainnet genesis blocks" << std::endl;
@@ -2622,7 +2622,7 @@ bool LoadBlockIndex(bool fAllowNew)
         printf("block.nTime = %u \n", block.nTime);
         printf("block.nNonce = %u \n", block.nNonce);
          
-        assert(block.hashMerkleRoot == uint256("0x184932d93405da0dbf15c04749457a6c22a59d111d985b1f1106e3d6ecdde8d7"));
+        assert(block.hashMerkleRoot == uint256("0x3062898269783fcb854598544f3141bfbeb39d828f06b55909f55cab0c818878")); // pskbank
         assert(block.GetHash() == (!fTestNet ? hashGenesisBlock : hashGenesisBlockTestNet));
         assert(block.CheckBlock());
 
