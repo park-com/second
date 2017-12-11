@@ -57,8 +57,8 @@ static const int64_t PB = 10000000;
 /** Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp. */
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 
-static const uint256 hashGenesisBlock("0x00000b9cac13aee6d83a4374f5d95d8dd923c7c7c01134eb0090651ea92df065");  // pskbank
-static const uint256 hashGenesisBlockTestNet("0x00003a507746fc500faa8d0d0992c89641aedd70f456e0e22cef2cdc9abaa986");
+static const uint256 hashGenesisBlock("0x00000610cdb8100fce3abcb99210583c323536cedef15f771560ca940035e1d9");  // pskbank
+static const uint256 hashGenesisBlockTestNet("0x0000b844e8a2b13e8f900e17659f7c8bb18a80c4e69ac9595b897b71781d8a08");
 
 inline int64_t PastDrift(int64_t nTime)   { return nTime - 10 * 60; } // up to 10 minutes from the past
 inline int64_t FutureDrift(int64_t nTime) { return nTime + 10 * 60; } // up to 10 minutes from the future
